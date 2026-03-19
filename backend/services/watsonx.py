@@ -7,16 +7,31 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # --- Speech to Text ---
-def transcribe_audio(audio_bytes: bytes, content_type: str = "audio/mp3") -> str:
+def transcribe_audio(audio_bytes: bytes, content_type: str = "audio/wav") -> str:
     authenticator = IAMAuthenticator(os.getenv("IBM_STT_API_KEY"))
     stt = SpeechToTextV1(authenticator=authenticator)
     stt.set_service_url(os.getenv("IBM_STT_URL"))
 
+    # Normalize content type — browsers sometimes send audio/wave or audio/x-wav
+    if "wav" in content_type:
+        content_type = "audio/wav"
+    elif "mp4" in content_type or "m4a" in content_type:
+        content_type = "audio/mp4"
+    elif "ogg" in content_type:
+        content_type = "audio/ogg"
+    else:
+        content_type = "audio/mp3"
+
+    # print(f"STT content_type: {content_type}")
+    # print(f"STT audio size: {len(audio_bytes)} bytes")
+
     result = stt.recognize(
         audio=audio_bytes,
         content_type=content_type,
-        model="en-US_BroadbandModel"
+        model="en-US_Multimedia",  # Better for voice memos/mic recordings
     ).get_result()
+
+    # print(f"STT result: {result}")
 
     transcripts = [
         r["alternatives"][0]["transcript"]
@@ -69,22 +84,20 @@ def summarize_visit(transcript: str, notes: str) -> str:
         }
     )
 
-    # Debug — print full response before parsing
-    print(f"Status: {res.status_code}")
-    print(f"Headers: {dict(res.headers)}")
-    print(f"Body: {res.text}")
+    # print(f"Status: {res.status_code}")
+    # print(f"Body: {res.text}")
 
     res.raise_for_status()
-    
+
     choices = res.json().get("choices", [])
     if not choices:
         return "No summary generated."
-    
+
     message = choices[0].get("message", {})
     content = message.get("content", "")
-    
+
     if isinstance(content, list):
         texts = [block.get("text", "") for block in content if block.get("response_type") == "text"]
         return " ".join(texts)
-    
+
     return content
