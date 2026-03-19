@@ -1,7 +1,15 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 import uuid
+from services.watsonx import transcribe_audio, summarize_visit
+import os
+import requests
+from ibm_watson import SpeechToTextV1
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 
 app = FastAPI()
 
@@ -31,16 +39,21 @@ def ping():
 
 # visit notes
 @app.post("/api/visits/summarize")
-async def summarize_visit(
+async def summarize_visit_route(
     notes: str = Form(...),
     audio: Optional[UploadFile] = File(None)
 ):
-    # Mock summary for now — will swap in Watsonx later
-    summary = f"Patient presented with symptoms described in notes. Doctor observed: {notes[:100]}. Follow-up recommended."
-    
+    transcript = ""
+    if audio:
+        audio_bytes = await audio.read()
+        transcript = transcribe_audio(audio_bytes, content_type=audio.content_type)
+
+    summary = summarize_visit(transcript, notes)
+
     visit = {
         "id": str(uuid.uuid4()),
         "notes": notes,
+        "transcript": transcript,
         "summary": summary,
     }
     visits.append(visit)
