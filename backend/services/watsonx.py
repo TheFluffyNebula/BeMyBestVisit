@@ -22,8 +22,8 @@ def transcribe_audio(audio_bytes: bytes, content_type: str = "audio/wav") -> str
     else:
         content_type = "audio/mp3"
 
-    # print(f"STT content_type: {content_type}")
-    # print(f"STT audio size: {len(audio_bytes)} bytes")
+    print(f"STT content_type: {content_type}")
+    print(f"STT audio size: {len(audio_bytes)} bytes")
 
     result = stt.recognize(
         audio=audio_bytes,
@@ -31,7 +31,7 @@ def transcribe_audio(audio_bytes: bytes, content_type: str = "audio/wav") -> str
         model="en-US_Multimedia",  # Better for voice memos/mic recordings
     ).get_result()
 
-    # print(f"STT result: {result}")
+    print(f"STT result: {result}")
 
     transcripts = [
         r["alternatives"][0]["transcript"]
@@ -43,6 +43,8 @@ def transcribe_audio(audio_bytes: bytes, content_type: str = "audio/wav") -> str
 
 # --- Get IAM Bearer Token ---
 def get_iam_token() -> str:
+    key = os.getenv("IBM_ORCHESTRATE_API_KEY")
+    print(f"API key loaded: {key[:6] if key else 'NONE'}...{key[-4:] if key else ''}")
     res = requests.post(
         "https://iam.cloud.ibm.com/identity/token",
         headers={"Content-Type": "application/x-www-form-urlencoded"},
@@ -84,8 +86,8 @@ def summarize_visit(transcript: str, notes: str) -> str:
         }
     )
 
-    # print(f"Status: {res.status_code}")
-    # print(f"Body: {res.text}")
+    print(f"Status: {res.status_code}")
+    print(f"Body: {res.text}")
 
     res.raise_for_status()
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 interface Visit {
   id: string
@@ -13,15 +14,19 @@ interface Visit {
 interface DataRequest {
   request_id: string
   status: string
+  provider_name?: string
 }
 
 export default function PatientView() {
+  const { user, logout } = useAuth()
   const [visits, setVisits] = useState<Visit[]>([])
   const [pendingRequests, setPendingRequests] = useState<DataRequest[]>([])
   const navigate = useNavigate()
 
+  const authHeader = { Authorization: `Bearer ${user?.token}` }
+
   useEffect(() => {
-    fetch('http://localhost:8000/api/visits')
+    fetch('http://localhost:8000/api/visits', { headers: authHeader })
       .then(res => res.json())
       .then(data => setVisits(data))
   }, [])
@@ -29,7 +34,7 @@ export default function PatientView() {
   // Poll for pending consent requests
   useEffect(() => {
     const interval = setInterval(() => {
-      fetch('http://localhost:8000/api/data-request/pending/all')
+      fetch('http://localhost:8000/api/data-request/pending/all', { headers: authHeader })
         .then(res => res.json())
         .then(data => setPendingRequests(data))
     }, 2000)
@@ -39,22 +44,37 @@ export default function PatientView() {
   const handleRespond = async (requestId: string, approved: boolean) => {
     await fetch(`http://localhost:8000/api/data-request/${requestId}/respond?approved=${approved}`, {
       method: 'POST',
+      headers: authHeader,
     })
     setPendingRequests(prev => prev.filter(r => r.request_id !== requestId))
   }
 
+  const handleLogout = () => {
+    logout()
+    navigate('/login', { replace: true })
+  }
+
   return (
     <div style={{ maxWidth: '700px', margin: '2rem auto' }}>
-      <h1>Patient Dashboard</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1>Patient Dashboard</h1>
+        <div style={{ textAlign: 'right' }}>
+          <span style={{ fontSize: '0.9rem', color: '#555' }}>{user?.name}</span>
+          <br />
+          <button onClick={handleLogout} style={{ fontSize: '0.85rem', marginTop: '0.25rem' }}>
+            Log out
+          </button>
+        </div>
+      </div>
 
       {/* Consent prompts */}
       {pendingRequests.map(req => (
         <div key={req.request_id} style={{ border: '2px solid orange', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' }}>
-          <p><strong>Your provider is requesting access to your medical data.</strong></p>
+          <p><strong>{req.provider_name ?? 'Your provider'} is requesting access to your medical data.</strong></p>
           <p>Do you consent to sharing your information?</p>
           <div style={{ display: 'flex', gap: '1rem' }}>
-            <button onClick={() => handleRespond(req.request_id, true)}>✅ Approve</button>
-            <button onClick={() => handleRespond(req.request_id, false)}>❌ Deny</button>
+            <button onClick={() => handleRespond(req.request_id, true)}>Approve</button>
+            <button onClick={() => handleRespond(req.request_id, false)}>Deny</button>
           </div>
         </div>
       ))}

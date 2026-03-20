@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 interface Visit {
   id: string
@@ -27,11 +28,14 @@ function renderSummary(summary: string) {
 export default function VisitDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [visit, setVisit] = useState<Visit | null>(null)
   const [notFound, setNotFound] = useState(false)
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/visits')
+    fetch('http://localhost:8000/api/visits', {
+      headers: { Authorization: `Bearer ${user?.token}` },
+    })
       .then(res => res.json())
       .then((visits: Visit[]) => {
         const found = visits.find(v => v.id === id)

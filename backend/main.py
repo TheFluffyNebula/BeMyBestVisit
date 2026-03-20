@@ -1,17 +1,17 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 import uuid
 from services.watsonx import transcribe_audio, summarize_visit
-import os
-import requests
-from ibm_watson import SpeechToTextV1
-from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 import json
 from pathlib import Path
+from auth import (
+    LoginRequest, RegisterRequest, Token, User,
+    login_endpoint, register_endpoint, get_current_user,
+)
 
 app = FastAPI()
 
@@ -23,13 +23,14 @@ app.add_middleware(
 )
 
 # In-memory store
-# Load dummy data at startup
 data_path = Path(__file__).parent / "data" / "visits.json"
 with open(data_path) as f:
     visits = json.load(f)
-data_requests = {}  # request_id -> { status: pending/approved/denied, data: ... }
 
-# Mock patient data
+# request_id -> { status, data, provider_name, provider_email }
+data_requests = {}
+
+# Mock patient data returned on consent approval
 MOCK_PATIENT_DATA = {
     "name": "Jane Doe",
     "dob": "1990-04-12",
@@ -38,15 +39,29 @@ MOCK_PATIENT_DATA = {
     "allergies": ["Penicillin"],
 }
 
+# --- Auth ---
+
+@app.post("/api/auth/login", response_model=Token)
+def login(body: LoginRequest):
+    return login_endpoint(body)
+
+@app.post("/api/auth/register", response_model=Token)
+def register(body: RegisterRequest):
+    return register_endpoint(body)
+
+# --- Ping ---
+
 @app.get("/ping")
 def ping():
     return {"message": "pong"}
 
-# visit notes
+# --- Visits ---
+
 @app.post("/api/visits/summarize")
 async def summarize_visit_route(
     notes: str = Form(...),
-    audio: Optional[UploadFile] = File(None)
+    audio: Optional[UploadFile] = File(None),
+    current_user: User = Depends(get_current_user),
 ):
     transcript = ""
     if audio:
@@ -60,30 +75,24 @@ async def summarize_visit_route(
         "notes": notes,
         "transcript": transcript,
         "summary": summary,
+        "provider": current_user.name,
+        "provider_email": current_user.email,
+        "date": __import__("datetime").date.today().isoformat(),
     }
     visits.append(visit)
     return visit
 
 @app.get("/api/visits")
-def get_visits():
+def get_visits(current_user: User = Depends(get_current_user)):
     return visits
 
-# patient consent
-@app.post("/api/data-request")
-def create_data_request():
-    request_id = str(uuid.uuid4())
-    data_requests[request_id] = {"status": "pending", "data": None}
-    return {"request_id": request_id}
+# --- Data requests ---
 
-@app.get("/api/data-request/{request_id}")
-def get_data_request(request_id: str):
-    req = data_requests.get(request_id)
-    if not req:
-        return {"status": "not_found"}
-    return {"request_id": request_id, **req}
+# IMPORTANT: /pending/all must be defined before /{request_id}
+# otherwise FastAPI matches "pending" as the request_id path param.
 
 @app.get("/api/data-request/pending/all")
-def get_pending_requests():
+def get_pending_requests(current_user: User = Depends(get_current_user)):
     pending = [
         {"request_id": rid, **val}
         for rid, val in data_requests.items()
@@ -91,13 +100,31 @@ def get_pending_requests():
     ]
     return pending
 
+@app.post("/api/data-request")
+def create_data_request(current_user: User = Depends(get_current_user)):
+    request_id = str(uuid.uuid4())
+    data_requests[request_id] = {
+        "status": "pending",
+        "data": None,
+        "provider_name": current_user.name,
+        "provider_email": current_user.email,
+    }
+    return {"request_id": request_id}
+
+@app.get("/api/data-request/{request_id}")
+def get_data_request(request_id: str, current_user: User = Depends(get_current_user)):
+    req = data_requests.get(request_id)
+    if not req:
+        return {"status": "not_found"}
+    return {"request_id": request_id, **req}
+
 @app.post("/api/data-request/{request_id}/respond")
-def respond_to_request(request_id: str, approved: bool):
+def respond_to_request(request_id: str, approved: bool, current_user: User = Depends(get_current_user)):
     req = data_requests.get(request_id)
     if not req:
         return {"error": "not found"}
     if approved:
-        data_requests[request_id] = {"status": "approved", "data": MOCK_PATIENT_DATA}
+        data_requests[request_id] = {**req, "status": "approved", "data": MOCK_PATIENT_DATA}
     else:
-        data_requests[request_id] = {"status": "denied", "data": None}
+        data_requests[request_id] = {**req, "status": "denied", "data": None}
     return {"status": data_requests[request_id]["status"]}

@@ -1,14 +1,20 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 export default function ProviderView() {
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
   const [notes, setNotes] = useState('')
   const [audio, setAudio] = useState<File | null>(null)
   const [submitStatus, setSubmitStatus] = useState('')
 
   // Flow 1 state
-  const [requestId, setRequestId] = useState<string | null>(null)
   const [requestStatus, setRequestStatus] = useState('')
   const [patientData, setPatientData] = useState<any>(null)
+
+  const authHeader = { Authorization: `Bearer ${user?.token}` }
 
   const handleSubmitVisit = async () => {
     setSubmitStatus('Submitting...')
@@ -18,6 +24,7 @@ export default function ProviderView() {
 
     const res = await fetch('http://localhost:8000/api/visits/summarize', {
       method: 'POST',
+      headers: authHeader,
       body: formData,
     })
     const data = await res.json()
@@ -30,14 +37,18 @@ export default function ProviderView() {
     setRequestStatus('Waiting for patient consent...')
     setPatientData(null)
 
-    const res = await fetch('http://localhost:8000/api/data-request', { method: 'POST' })
+    const res = await fetch('http://localhost:8000/api/data-request', {
+      method: 'POST',
+      headers: authHeader,
+    })
     const data = await res.json()
     const id = data.request_id
-    setRequestId(id)
 
     // Poll every 2 seconds
     const interval = setInterval(async () => {
-      const pollRes = await fetch(`http://localhost:8000/api/data-request/${id}`)
+      const pollRes = await fetch(`http://localhost:8000/api/data-request/${id}`, {
+        headers: authHeader,
+      })
       const pollData = await pollRes.json()
 
       if (pollData.status === 'approved') {
@@ -51,9 +62,23 @@ export default function ProviderView() {
     }, 2000)
   }
 
+  const handleLogout = () => {
+    logout()
+    navigate('/login', { replace: true })
+  }
+
   return (
     <div style={{ maxWidth: '600px', margin: '2rem auto' }}>
-      <h1>Provider Dashboard</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1>Provider Dashboard</h1>
+        <div style={{ textAlign: 'right' }}>
+          <span style={{ fontSize: '0.9rem', color: '#555' }}>{user?.name}</span>
+          <br />
+          <button onClick={handleLogout} style={{ fontSize: '0.85rem', marginTop: '0.25rem' }}>
+            Log out
+          </button>
+        </div>
+      </div>
 
       {/* Flow 1 */}
       <h2>Request Patient Data</h2>
