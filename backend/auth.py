@@ -31,12 +31,16 @@ def _seed_users():
     USERS_DB["provider@demo.com"] = {
         "email": "provider@demo.com",
         "name": "Dr. Smith",
+        "job_title": "Pediatrician",
+        "institution": "UNC Health",
         "hashed_password": _hash_password("password"),
         "role": "provider",
     }
     USERS_DB["patient@demo.com"] = {
         "email": "patient@demo.com",
         "name": "Jane Doe",
+        "job_title": None,
+        "institution": None,
         "hashed_password": _hash_password("password"),
         "role": "patient",
     }
@@ -49,6 +53,8 @@ class User(BaseModel):
     email: str
     name: str
     role: str
+    job_title: Optional[str] = None
+    institution: Optional[str] = None
 
 
 class Token(BaseModel):
@@ -56,6 +62,8 @@ class Token(BaseModel):
     token_type: str
     role: str
     name: str
+    job_title: Optional[str] = None
+    institution: Optional[str] = None
 
 
 class LoginRequest(BaseModel):
@@ -68,6 +76,8 @@ class RegisterRequest(BaseModel):
     password: str
     name: str
     role: str  # "provider" or "patient"
+    job_title: Optional[str] = None       # providers only, e.g. "Pediatrician"
+    institution: Optional[str] = None     # providers only, e.g. "UNC Health"
 
 
 def get_user(email: str) -> Optional[dict]:
@@ -85,6 +95,17 @@ def create_access_token(email: str) -> str:
     expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {"sub": email, "exp": expire}
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def _user_to_token(user: dict, token: str) -> Token:
+    return Token(
+        access_token=token,
+        token_type="bearer",
+        role=user["role"],
+        name=user["name"],
+        job_title=user.get("job_title"),
+        institution=user.get("institution"),
+    )
 
 
 async def get_current_user(
@@ -105,7 +126,13 @@ async def get_current_user(
     user = get_user(email)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
-    return User(email=user["email"], name=user["name"], role=user["role"])
+    return User(
+        email=user["email"],
+        name=user["name"],
+        role=user["role"],
+        job_title=user.get("job_title"),
+        institution=user.get("institution"),
+    )
 
 
 def login_endpoint(body: LoginRequest) -> Token:
@@ -116,7 +143,7 @@ def login_endpoint(body: LoginRequest) -> Token:
             detail="Incorrect email or password",
         )
     token = create_access_token(user["email"])
-    return Token(access_token=token, token_type="bearer", role=user["role"], name=user["name"])
+    return _user_to_token(user, token)
 
 
 def register_endpoint(body: RegisterRequest) -> Token:
@@ -127,8 +154,10 @@ def register_endpoint(body: RegisterRequest) -> Token:
     USERS_DB[body.email] = {
         "email": body.email,
         "name": body.name,
+        "job_title": body.job_title if body.role == "provider" else None,
+        "institution": body.institution if body.role == "provider" else None,
         "hashed_password": _hash_password(body.password),
         "role": body.role,
     }
     token = create_access_token(body.email)
-    return Token(access_token=token, token_type="bearer", role=body.role, name=body.name)
+    return _user_to_token(USERS_DB[body.email], token)

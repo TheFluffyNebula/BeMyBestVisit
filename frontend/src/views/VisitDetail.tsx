@@ -5,7 +5,9 @@ import { useAuth } from '../context/AuthContext'
 interface Visit {
   id: string
   date: string
-  provider: string
+  institution: string
+  doctor_name: string
+  job_title: string
   notes: string
   transcript: string
   summary: string
@@ -64,6 +66,8 @@ export default function VisitDetail() {
       </button>
 
       <h1>Visit Detail</h1>
+      <p style={{ fontWeight: 'bold' }}>{visit.institution}</p>
+      <p style={{ color: '#666' }}>{visit.doctor_name}, {visit.job_title}</p>
       <p style={{ color: '#888' }}>
         {new Date(visit.date).toLocaleDateString('en-US', {
           year: 'numeric',
