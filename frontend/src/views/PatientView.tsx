@@ -17,6 +17,7 @@ interface DataRequest {
   request_id: string
   status: string
   provider_name?: string
+  provider_institution?: string
 }
 
 export default function PatientView() {
@@ -72,7 +73,7 @@ export default function PatientView() {
       {/* Consent prompts */}
       {pendingRequests.map(req => (
         <div key={req.request_id} style={{ border: '2px solid orange', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' }}>
-          <p><strong>{req.provider_name ?? 'Your provider'} is requesting access to your medical data.</strong></p>
+          <p><strong>{req.provider_institution ?? req.provider_name ?? 'Your provider'} is requesting access to your medical data.</strong></p>
           <p>Do you consent to sharing your information?</p>
           <div style={{ display: 'flex', gap: '1rem' }}>
             <button onClick={() => handleRespond(req.request_id, true)}>Approve</button>
