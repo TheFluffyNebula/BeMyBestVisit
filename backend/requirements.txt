@@ -5,3 +5,5 @@ python-dotenv
 requests
 ibm-watson
 ibm-cloud-sdk-core
+python-jose[cryptography]
+bcrypt
