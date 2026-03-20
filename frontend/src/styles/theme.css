@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap');
+
+:root {
+  /* Patient palette — light */
+  --patient-bg: #f7f6f2;
+  --patient-surface: #ffffff;
+  --patient-border: #e8e5de;
+  --patient-text: #1a1a18;
+  --patient-text-muted: #8a8880;
+  --patient-accent: #3d7a6f;
+  --patient-accent-light: #eef5f4;
+  --patient-accent-hover: #2e5e55;
+  --patient-warning: #c4792a;
+  --patient-warning-light: #fdf3e7;
+  --patient-success: #3d7a6f;
+  --patient-success-light: #eef5f4;
+  --patient-danger: #b85450;
+  --patient-danger-light: #fdf0ef;
+
+  /* Provider palette — dark */
+  --provider-bg: #0f1419;
+  --provider-surface: #161d26;
+  --provider-surface-2: #1e2733;
+  --provider-border: #2a3441;
+  --provider-text: #e8edf2;
+  --provider-text-muted: #6b7d8f;
+  --provider-accent: #4a9ebe;
+  --provider-accent-hover: #5fb0d0;
+  --provider-accent-light: rgba(74, 158, 190, 0.1);
+  --provider-success: #4caf7d;
+  --provider-success-light: rgba(76, 175, 125, 0.1);
+  --provider-warning: #e0a050;
+  --provider-warning-light: rgba(224, 160, 80, 0.1);
+  --provider-danger: #e06060;
+  --provider-danger-light: rgba(224, 96, 96, 0.1);
+
+  /* Shared */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'DM Sans', sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --transition: 150ms ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
