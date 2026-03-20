@@ -14,12 +14,18 @@ export default function ProviderView() {
   const [requestStatus, setRequestStatus] = useState('')
   const [patientData, setPatientData] = useState<any>(null)
 
+  // Flow 2 state
+  const [patientEmail, setPatientEmail] = useState('')
+  const [provider, setProvider] = useState('')
+
   const authHeader = { Authorization: `Bearer ${user?.token}` }
 
   const handleSubmitVisit = async () => {
     setSubmitStatus('Submitting...')
     const formData = new FormData()
     formData.append('notes', notes)
+    formData.append('patient_email', patientEmail)
+    formData.append('provider', provider)
     if (audio) formData.append('audio', audio)
 
     const res = await fetch('http://localhost:8000/api/visits/summarize', {
@@ -98,6 +104,18 @@ export default function ProviderView() {
 
       {/* Flow 2 */}
       <h2>Submit Visit Notes</h2>
+      <input
+        type="text"
+        placeholder="Care provider name (e.g. UNC Health)"
+        value={provider}
+        onChange={e => setProvider(e.target.value)}
+      />
+      <input
+        type="email"
+        placeholder="Patient email address"
+        value={patientEmail}
+        onChange={e => setPatientEmail(e.target.value)}
+      />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <textarea
           rows={5}

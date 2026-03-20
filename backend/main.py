@@ -5,7 +5,8 @@ from fastapi import FastAPI, UploadFile, File, Form, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 import uuid
-from services.watsonx import transcribe_audio, summarize_visit
+from services.watsonx import transcribe_audio, summarize_visit, send_visit_email
+from datetime import datetime
 import json
 from pathlib import Path
 from auth import (
@@ -60,6 +61,8 @@ def ping():
 @app.post("/api/visits/summarize")
 async def summarize_visit_route(
     notes: str = Form(...),
+    patient_email: str = Form(""),
+    provider: str = Form(""),
     audio: Optional[UploadFile] = File(None),
     current_user: User = Depends(get_current_user),
 ):
@@ -72,14 +75,22 @@ async def summarize_visit_route(
 
     visit = {
         "id": str(uuid.uuid4()),
+        "date": datetime.now().strftime("%Y-%m-%d"),
+        "provider": provider,
         "notes": notes,
         "transcript": transcript,
         "summary": summary,
-        "provider": current_user.name,
-        "provider_email": current_user.email,
-        "date": __import__("datetime").date.today().isoformat(),
     }
     visits.append(visit)
+
+    # Send email notification separately
+    if patient_email:
+        send_visit_email(
+            patient_email=patient_email,
+            provider=provider,
+            date=datetime.now().strftime("%B %d, %Y")
+        )
+
     return visit
 
 @app.get("/api/visits")
