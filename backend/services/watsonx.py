@@ -3,6 +3,7 @@ import requests
 from ibm_watson import SpeechToTextV1
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 
@@ -64,15 +65,13 @@ def summarize_visit(transcript: str, notes: str) -> str:
     base_url = os.getenv("IBM_ORCHESTRATE_URL").rstrip("/")
     url = f"{base_url}/v1/orchestrate/{agent_id}/chat/completions"
 
-    prompt = f"""Please summarize the following doctor visit into a structured clinical note.
+    prompt = f"""Summarize the following doctor visit into a structured clinical note with three sections: Chief Complaint, Observations, and Plan.
 
     Audio Transcript:
     {transcript}
 
     Doctor's Written Notes:
-    {notes}
-
-    Provide three sections: Chief Complaint, Observations, and Plan."""
+    {notes}"""
 
     res = requests.post(
         url,
@@ -82,7 +81,7 @@ def summarize_visit(transcript: str, notes: str) -> str:
         },
         json={
             "messages": [{"role": "user", "content": prompt}],
-            "stream": False
+            "stream": False,
         }
     )
 
@@ -103,3 +102,30 @@ def summarize_visit(transcript: str, notes: str) -> str:
         return " ".join(texts)
 
     return content
+
+def send_visit_email(patient_email: str, provider: str, date: str) -> None:
+    token = get_iam_token()
+    agent_id = os.getenv("IBM_ORCHESTRATE_AGENT_ID")
+    base_url = os.getenv("IBM_ORCHESTRATE_URL").rstrip("/")
+    url = f"{base_url}/v1/orchestrate/{agent_id}/chat/completions"
+
+    prompt = f"Send an email to {patient_email} with subject \"New Visit Summary\" and body \"You have a new visit summary from {provider} on {date}. Please log in to view your visit details.\""
+
+    res = requests.post(
+        url,
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "messages": [
+                {"role": "user", "content": "Hello"},
+                {"role": "assistant", "content": "Hello! How can I help you today?"},
+                {"role": "user", "content": prompt}
+            ],
+            "stream": False,
+        }
+    )
+
+    print(f"Email status: {res.status_code}")
+    print(f"Email body: {res.text}")
