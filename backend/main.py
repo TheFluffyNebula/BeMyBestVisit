@@ -27,6 +27,7 @@ VISITS_FILE = Path(__file__).parent / "data" / "visits.json"
 FORMS_FILE = Path(__file__).parent / "data" / "forms.json"
 REQUESTS_FILE = Path(__file__).parent / "data" / "requests.json"
 PROVIDER_FORMS_FILE = Path(__file__).parent / "data" / "provider_forms.json"
+PATIENT_PROFILE_FILE = Path(__file__).parent / "data" / "patient_profile.json"
 
 def load_forms():
     with open(FORMS_FILE) as f:
@@ -176,6 +177,37 @@ def respond_to_form_request(
 
     save_requests(requests_data)
     return req
+
+# --- Patient Profile ---
+
+def load_patient_profiles():
+    with open(PATIENT_PROFILE_FILE) as f:
+        return json.load(f)
+
+def save_patient_profiles(data):
+    with open(PATIENT_PROFILE_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+
+EMPTY_PROFILE = {
+    "demographics": {"full_name": "", "dob": "", "gender": "", "address": "", "phone": "", "emergency_contact_name": "", "emergency_contact_phone": ""},
+    "medical_history": {"conditions": "", "hospitalizations": ""},
+    "medications": {"prescriptions": "", "otc_supplements": ""},
+    "allergies": {"drug_allergies": "", "other_allergies": ""},
+    "family_history": {"family_conditions": ""},
+    "vaccinations": {"vaccination_list": "", "flu_shot": ""},
+}
+
+@app.get("/api/patient/profile")
+def get_patient_profile(current_user: User = Depends(get_current_user)):
+    profiles = load_patient_profiles()
+    return profiles.get(current_user.email, EMPTY_PROFILE)
+
+@app.put("/api/patient/profile")
+def update_patient_profile(profile: dict, current_user: User = Depends(get_current_user)):
+    profiles = load_patient_profiles()
+    profiles[current_user.email] = profile
+    save_patient_profiles(profiles)
+    return profile
 
 # --- Forms ---
 
