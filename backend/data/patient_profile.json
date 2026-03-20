@@ -1,0 +1,32 @@
+{
+  "patient@demo.com": {
+    "demographics": {
+      "full_name": "Jason Yin",
+      "dob": "",
+      "gender": "",
+      "address": "",
+      "phone": "",
+      "emergency_contact_name": "",
+      "emergency_contact_phone": ""
+    },
+    "medical_history": {
+      "conditions": "",
+      "hospitalizations": ""
+    },
+    "medications": {
+      "prescriptions": "",
+      "otc_supplements": ""
+    },
+    "allergies": {
+      "drug_allergies": "",
+      "other_allergies": ""
+    },
+    "family_history": {
+      "family_conditions": ""
+    },
+    "vaccinations": {
+      "vaccination_list": "",
+      "flu_shot": ""
+    }
+  }
+}
