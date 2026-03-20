@@ -2,7 +2,9 @@
   {
     "id": "1",
     "date": "2024-11-03",
-    "provider": "UNC Health",
+    "institution": "UNC Health",
+    "doctor_name": "Dr. Hailey",
+    "job_title": "Pediatrician",
     "notes": "Patient reports persistent lower back pain for two weeks. Pain level 6/10. No radiation to legs. History of muscle strain.",
     "transcript": "The patient is a 45 year old male presenting with lower back pain. He states the pain started about two weeks ago after lifting heavy boxes. He rates the pain as a six out of ten. No numbness or tingling in the legs.",
     "summary": "**Chief Complaint:**\n- Lower back pain for two weeks, rated 6/10.\n\n**Observations:**\n- 45-year-old male with acute muscle strain following heavy lifting.\n- No neurological symptoms or radicular involvement.\n\n**Plan:**\n- Ibuprofen 400mg as needed.\n- Physical therapy referral.\n- Follow-up in two weeks if no improvement."
@@ -10,7 +12,9 @@
   {
     "id": "2",
     "date": "2025-01-15",
-    "provider": "Duke University Hospital",
+    "institution": "Duke Health",
+    "doctor_name": "Dr. Sans",
+    "job_title": "Physical Therapist",
     "notes": "Routine follow-up for Type 2 Diabetes. A1C results reviewed. Patient reports good medication adherence.",
     "transcript": "Patient returns for diabetes follow-up. A1C is 7.2, down from 7.8 last quarter. Patient has been taking Metformin consistently and reports no side effects. Blood pressure is 128 over 82.",
     "summary": "**Chief Complaint:**\n- Routine diabetes management follow-up.\n\n**Observations:**\n- A1C improved to 7.2 from 7.8. Blood pressure 128/82.\n- Good Metformin adherence, no reported side effects.\n\n**Plan:**\n- Continue current Metformin dosage.\n- Recheck A1C in 3 months.\n- Encouraged continued dietary modifications."
@@ -18,9 +22,31 @@
   {
     "id": "3",
     "date": "2025-06-22",
-    "provider": "Wake Health",
+    "institution": "Private Therapy Practice",
+    "doctor_name": "Sanders Meander",
+    "job_title": "Licensed Mental Health Counselor",
     "notes": "Patient presents with seasonal allergies. Sneezing, itchy eyes, nasal congestion. Worse this year than previous years.",
     "transcript": "The patient is here for seasonal allergies. She reports sneezing frequently, itchy and watery eyes, and nasal congestion starting about three weeks ago. Symptoms are worse in the morning. She has tried over the counter antihistamines with minimal relief.",
     "summary": "**Chief Complaint:**\n- Seasonal allergic rhinitis, worsening this season.\n\n**Observations:**\n- Symptoms include sneezing, conjunctivitis, and nasal congestion.\n- OTC antihistamines providing insufficient relief.\n\n**Plan:**\n- Prescribe Flonase nasal spray.\n- Switch to Cetirizine for better antihistamine coverage.\n- Referral to allergist if no improvement in 4 weeks."
+  },
+  {
+    "id": "4",
+    "date": "2025-09-10",
+    "institution": "Private Dentist Practice",
+    "doctor_name": "Dr. Bob",
+    "job_title": "Dentist",
+    "notes": "Routine cleaning and checkup. No cavities found. Minor tartar buildup on lower molars. Patient reports occasional sensitivity to cold.",
+    "transcript": "Patient is here for their six month cleaning and checkup. X-rays look good, no cavities detected. There is some minor tartar buildup on the lower molars which was addressed during cleaning. Patient mentions occasional sensitivity to cold beverages on the upper right side.",
+    "summary": "**Chief Complaint:**\n- Routine dental checkup and cleaning.\n\n**Observations:**\n- No cavities detected on X-ray.\n- Minor tartar buildup on lower molars, addressed during cleaning.\n- Reported cold sensitivity upper right quadrant.\n\n**Plan:**\n- Recommend sensitivity toothpaste for daily use.\n- Schedule follow-up in 6 months.\n- Monitor upper right sensitivity at next visit."
+  },
+  {
+    "id": "b86c9343-f4b0-4787-a966-ba3cb7c1a9f8",
+    "date": "2026-03-20",
+    "institution": "UNC Health",
+    "doctor_name": "Dr. Smith",
+    "job_title": "Pediatrician",
+    "notes": "Good Recovery",
+    "transcript": "hello the patient is doing well ",
+    "summary": "**Chief Complaint:**  \n- Follow\u2011up visit; patient reports doing well.\n\n**Observations:**  \n- Overall recovery noted to be good. No new complaints or concerning findings reported.\n\n**Plan:**  \n- Continue current management; routine follow\u2011up as scheduled. No changes to treatment at this time."
   }
 ]

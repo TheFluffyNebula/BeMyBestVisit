@@ -23,10 +23,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# In-memory store
-data_path = Path(__file__).parent / "data" / "visits.json"
-with open(data_path) as f:
-    visits = json.load(f)
+VISITS_FILE = Path(__file__).parent / "data" / "visits.json"
+def load_visits():
+    with open(VISITS_FILE) as f:
+        return json.load(f)
+def save_visits(visits):
+    with open(VISITS_FILE, "w") as f:
+        json.dump(visits, f, indent=2)
+# Load at startup
+visits = load_visits()
 
 # request_id -> { status, data, provider_name, provider_email }
 data_requests = {}
@@ -66,6 +71,7 @@ async def summarize_visit_route(
     audio: Optional[UploadFile] = File(None),
     current_user: User = Depends(get_current_user),
 ):
+    print(current_user, current_user.name)
     transcript = ""
     if audio:
         audio_bytes = await audio.read()
@@ -76,12 +82,15 @@ async def summarize_visit_route(
     visit = {
         "id": str(uuid.uuid4()),
         "date": datetime.now().strftime("%Y-%m-%d"),
-        "provider": provider,
+        "institution": current_user.institution,
+        "doctor_name": current_user.name,
+        "job_title": current_user.job_title,
         "notes": notes,
         "transcript": transcript,
         "summary": summary,
     }
     visits.append(visit)
+    save_visits(visits)
 
     # Send email notification separately
     if patient_email:
