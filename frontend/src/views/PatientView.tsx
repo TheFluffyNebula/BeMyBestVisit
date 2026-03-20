@@ -13,6 +13,13 @@ interface Visit {
   summary: string
 }
 
+interface DataRequest {
+  request_id: string
+  status: string
+  provider_name?: string
+  provider_institution?: string
+}
+
 export default function PatientView() {
   const { user, logout } = useAuth()
   const [visits, setVisits] = useState<Visit[]>([])
@@ -44,13 +51,17 @@ export default function PatientView() {
         </div>
       </div>
 
-      {/* Pending requests button */}
-      <button
-        onClick={() => navigate('/patient/requests')}
-        style={{ marginBottom: '1.5rem' }}
-      >
-        📋 View Pending Requests
-      </button>
+      {/* Consent prompts */}
+      {pendingRequests.map(req => (
+        <div key={req.request_id} style={{ border: '2px solid orange', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' }}>
+          <p><strong>{req.provider_institution ?? req.provider_name ?? 'Your provider'} is requesting access to your medical data.</strong></p>
+          <p>Do you consent to sharing your information?</p>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button onClick={() => handleRespond(req.request_id, true)}>Approve</button>
+            <button onClick={() => handleRespond(req.request_id, false)}>Deny</button>
+          </div>
+        </div>
+      ))}
 
       {/* Visit history */}
       <h2>Your Visit History</h2>
