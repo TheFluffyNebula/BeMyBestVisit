@@ -28,17 +28,41 @@ USERS_DB: dict[str, dict] = {}
 
 
 def _seed_users():
-    USERS_DB["provider@demo.com"] = {
-        "email": "provider@demo.com",
-        "name": "Dr. Smith",
+    USERS_DB["hailey@unchealth.com"] = {
+        "email": "hailey@unchealth.com",
+        "name": "Dr. Hailey",
         "job_title": "Pediatrician",
         "institution": "UNC Health",
         "hashed_password": _hash_password("password"),
         "role": "provider",
     }
+    USERS_DB["sans@dukehealth.com"] = {
+        "email": "sans@dukehealth.com",
+        "name": "Dr. Sans",
+        "job_title": "Physical Therapist",
+        "institution": "Duke Health",
+        "hashed_password": _hash_password("password"),
+        "role": "provider",
+    }
+    USERS_DB["sanders@sanderstherapy.com"] = {
+        "email": "sanders@sanderstherapy.com",
+        "name": "Sanders Meander",
+        "job_title": "Licensed Mental Health Counselor",
+        "institution": "Private Therapy Practice",
+        "hashed_password": _hash_password("password"),
+        "role": "provider",
+    }
+    USERS_DB["bob@bobtheprivatedentist.com"] = {
+        "email": "bob@bobtheprivatedentist.com",
+        "name": "Dr. Bob",
+        "job_title": "Dentist",
+        "institution": "Private Dentist Practice",
+        "hashed_password": _hash_password("password"),
+        "role": "provider",
+    }
     USERS_DB["patient@demo.com"] = {
         "email": "patient@demo.com",
-        "name": "Jane Doe",
+        "name": "Jason Yin",
         "job_title": None,
         "institution": None,
         "hashed_password": _hash_password("password"),

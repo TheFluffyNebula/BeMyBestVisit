@@ -33,7 +33,7 @@ data_requests = {}
 
 # Mock patient data returned on consent approval
 MOCK_PATIENT_DATA = {
-    "name": "Jane Doe",
+    "name": "Jason Yin",
     "dob": "1990-04-12",
     "conditions": ["Type 2 Diabetes", "Hypertension"],
     "medications": ["Metformin", "Lisinopril"],
@@ -76,7 +76,8 @@ async def summarize_visit_route(
     visit = {
         "id": str(uuid.uuid4()),
         "date": datetime.now().strftime("%Y-%m-%d"),
-        "provider": provider,
+        "provider": current_user.name,
+        "institution": current_user.institution,
         "notes": notes,
         "transcript": transcript,
         "summary": summary,
@@ -118,6 +119,7 @@ def create_data_request(current_user: User = Depends(get_current_user)):
         "status": "pending",
         "data": None,
         "provider_name": current_user.name,
+        "provider_institution": current_user.institution,
         "provider_email": current_user.email,
     }
     return {"request_id": request_id}
