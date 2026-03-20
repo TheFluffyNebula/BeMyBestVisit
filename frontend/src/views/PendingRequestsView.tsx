@@ -14,6 +14,10 @@ const FORM_LABELS: { [key: string]: string } = {
   dh9: 'DH9 Mental Health Intake Form',
 }
 
+const FORM_HAS_PREVIEW: { [key: string]: boolean } = {
+  intake: true, telehealth: true, pediatric: true, dh9: true,
+}
+
 export default function PendingRequestsView() {
   const [requests, setRequests] = useState<DataRequest[]>([])
   const navigate = useNavigate()
@@ -68,7 +72,17 @@ export default function PendingRequestsView() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {Object.entries(req.form_statuses).map(([formId, status]) => (
                 <div key={formId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 1rem', background: 'var(--patient-bg)', borderRadius: 'var(--radius-sm)' }}>
-                  <span style={{ fontSize: '0.875rem', color: 'var(--patient-text)' }}>{FORM_LABELS[formId] || formId}</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', textAlign: 'left' }}>
+                    <span style={{ fontSize: '0.875rem', color: 'var(--patient-text)' }}>{FORM_LABELS[formId] || formId}</span>
+                    {FORM_HAS_PREVIEW[formId] && (
+                      <span
+                        onClick={() => navigate(`/patient/data-preview?form=${formId}`)}
+                        style={{ fontSize: '0.75rem', color: 'var(--patient-accent)', cursor: 'pointer', textDecoration: 'underline' }}
+                      >
+                        See what data this uses
+                      </span>
+                    )}
+                  </div>
                   {status === 'pending' ? (
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       <button

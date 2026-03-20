@@ -77,22 +77,40 @@ export default function PatientView() {
               {user?.name}
             </h1>
           </div>
-          <button
-            onClick={() => navigate('/patient/requests')}
-            style={{
-              background: 'var(--patient-accent-light)',
-              border: '1px solid var(--patient-accent)',
-              borderRadius: 'var(--radius-md)',
-              padding: '0.6rem 1.2rem',
-              fontSize: '0.85rem',
-              color: 'var(--patient-accent)',
-              cursor: 'pointer',
-              fontFamily: 'var(--font-body)',
-              fontWeight: 500,
-            }}
-          >
-            📋 Pending Requests
-          </button>
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <button
+              onClick={() => navigate('/patient/my-data')}
+              style={{
+                background: 'none',
+                border: '1px solid var(--patient-border)',
+                borderRadius: 'var(--radius-md)',
+                padding: '0.6rem 1.2rem',
+                fontSize: '0.85rem',
+                color: 'var(--patient-text-muted)',
+                cursor: 'pointer',
+                fontFamily: 'var(--font-body)',
+                fontWeight: 500,
+              }}
+            >
+              My Health Data
+            </button>
+            <button
+              onClick={() => navigate('/patient/requests')}
+              style={{
+                background: 'var(--patient-accent-light)',
+                border: '1px solid var(--patient-accent)',
+                borderRadius: 'var(--radius-md)',
+                padding: '0.6rem 1.2rem',
+                fontSize: '0.85rem',
+                color: 'var(--patient-accent)',
+                cursor: 'pointer',
+                fontFamily: 'var(--font-body)',
+                fontWeight: 500,
+              }}
+            >
+              📋 Pending Requests
+            </button>
+          </div>
         </div>
 
         <h2 style={{ fontSize: '0.75rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--patient-text-muted)', marginBottom: '1rem', fontWeight: 500 }}>
@@ -122,7 +140,7 @@ export default function PatientView() {
               onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--patient-accent)')}
               onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--patient-border)')}
             >
-              <div>
+              <div style={{ textAlign: 'left' }}>
                 <p style={{ fontWeight: 500, color: 'var(--patient-text)', marginBottom: '0.2rem' }}>{visit.institution}</p>
                 <p style={{ fontSize: '0.8rem', color: 'var(--patient-text-muted)' }}>{visit.doctor_name} · {visit.job_title}</p>
               </div>

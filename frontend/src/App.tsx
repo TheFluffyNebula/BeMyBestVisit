@@ -10,6 +10,7 @@ import PendingRequestsView from './views/PendingRequestsView'
 import DH9FormView from './views/DH9FormView'
 import MyDataView from './views/MyDataView'
 import PatientOnboarding from './views/PatientOnboarding'
+import DataPreviewView from './views/DataPreviewView'
 
 export default function App() {
   return (
@@ -78,6 +79,14 @@ export default function App() {
           element={
             <ProtectedRoute role="patient">
               <PatientOnboarding />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/patient/data-preview"
+          element={
+            <ProtectedRoute role="patient">
+              <DataPreviewView />
             </ProtectedRoute>
           }
         />

@@ -49,51 +49,121 @@ export default function MyDataView() {
     setSaving(false)
   }
 
-  if (!loaded) return <div style={{ maxWidth: '700px', margin: '3rem auto', padding: '0 1.5rem' }}>Loading...</div>
+  if (!loaded) {
+    return (
+      <div style={{ minHeight: '100vh', background: 'var(--patient-bg)', fontFamily: 'var(--font-body)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: 'var(--patient-text-muted)' }}>Loading...</p>
+      </div>
+    )
+  }
 
   return (
-    <div style={{ maxWidth: '760px', margin: '2rem auto', padding: '0 1.5rem' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--patient-bg)', fontFamily: 'var(--font-body)' }}>
 
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+      <div style={{
+        background: 'var(--patient-surface)',
+        borderBottom: '1px solid var(--patient-border)',
+        padding: '1rem 2rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1rem',
+      }}>
         <button
           onClick={() => navigate('/patient')}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem', padding: 0 }}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: 'var(--patient-text-muted)',
+            fontFamily: 'var(--font-body)',
+            fontSize: '0.85rem',
+            padding: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.35rem',
+          }}
         >
-          ←
+          ← Dashboard
         </button>
-        <h1 style={{ margin: 0 }}>My Health Data</h1>
+        <span style={{ color: 'var(--patient-border)' }}>|</span>
+        <span style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '1.1rem',
+          fontWeight: 300,
+          color: 'var(--patient-text)',
+        }}>
+          My Health Data
+        </span>
       </div>
-      <p style={{ color: '#888', marginBottom: '2.5rem' }}>
-        This is the information the application stores on you. Click Edit on any section to update it.
-      </p>
 
-      {/* Groups */}
-      {SECTION_GROUPS.map(group => (
-        <div key={group.id} style={{ marginBottom: '2.5rem' }}>
-          {/* Group header */}
-          <div style={{ borderBottom: '2px solid #333', marginBottom: '1.25rem', paddingBottom: '0.4rem' }}>
-            <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700 }}>{group.title}</h2>
-            <p style={{ margin: '0.2rem 0 0', color: '#888', fontSize: '0.85rem' }}>{group.subtitle}</p>
-          </div>
+      {/* Content */}
+      <div style={{ maxWidth: '760px', margin: '0 auto', padding: '2.5rem 2rem' }}>
 
-          {/* Sections within group */}
-          {group.sections.map(section => (
-            <SectionCard
-              key={section.id}
-              section={section}
-              data={profile[section.id] ?? {}}
-              isEditing={editingSection === section.id}
-              draft={draft}
-              saving={saving}
-              onEdit={() => startEdit(section.id)}
-              onSave={() => saveSection(section.id)}
-              onCancel={cancelEdit}
-              onDraftChange={setDraft}
-            />
-          ))}
+        <div style={{ marginBottom: '2.5rem' }}>
+          <p style={{
+            fontSize: '0.7rem',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: 'var(--patient-accent)',
+            marginBottom: '0.4rem',
+            fontWeight: 500,
+          }}>
+            Health Profile
+          </p>
+          <h1 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '2rem',
+            fontWeight: 300,
+            color: 'var(--patient-text)',
+            marginBottom: '0.5rem',
+          }}>
+            {user?.name}
+          </h1>
+          <p style={{ fontSize: '0.875rem', color: 'var(--patient-text-muted)', lineHeight: 1.6 }}>
+            This information is stored securely and used to pre-fill your medical forms. Click Edit on any section to update it.
+          </p>
         </div>
-      ))}
+
+        {/* Groups */}
+        {SECTION_GROUPS.map(group => (
+          <div key={group.id} style={{ marginBottom: '2.5rem' }}>
+
+            {/* Group header */}
+            <div style={{ marginBottom: '1rem', paddingBottom: '0.6rem', borderBottom: '1px solid var(--patient-border)' }}>
+              <p style={{
+                fontSize: '0.75rem',
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: 'var(--patient-text-muted)',
+                fontWeight: 500,
+                marginBottom: '0.2rem',
+              }}>
+                {group.title}
+              </p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--patient-text-muted)' }}>{group.subtitle}</p>
+            </div>
+
+            {/* Sections */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '0 2.5rem' }}>
+              {group.sections.map(section => (
+                <SectionCard
+                  key={section.id}
+                  section={section}
+                  data={profile[section.id] ?? {}}
+                  isEditing={editingSection === section.id}
+                  draft={draft}
+                  saving={saving}
+                  onEdit={() => startEdit(section.id)}
+                  onSave={() => saveSection(section.id)}
+                  onCancel={cancelEdit}
+                  onDraftChange={setDraft}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -115,97 +185,152 @@ interface SectionCardProps {
 function SectionCard({ section, data, isEditing, draft, saving, onEdit, onSave, onCancel, onDraftChange }: SectionCardProps) {
   const noData = isEmpty(data)
 
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    background: 'var(--patient-bg)',
+    border: '1px solid var(--patient-border)',
+    borderRadius: 'var(--radius-sm)',
+    padding: '0.55rem 0.8rem',
+    fontSize: '0.875rem',
+    color: 'var(--patient-text)',
+    fontFamily: 'var(--font-body)',
+    outline: 'none',
+  }
+
   return (
     <div style={{
-      border: '1px solid #e0e0e0',
-      borderRadius: '10px',
-      marginBottom: '1rem',
+      background: 'var(--patient-surface)',
+      border: '1px solid var(--patient-border)',
+      borderRadius: 'var(--radius-md)',
       overflow: 'hidden',
     }}>
       {/* Section header */}
       <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        position: 'relative',
         padding: '0.75rem 1.25rem',
-        background: '#fafafa',
-        borderBottom: '1px solid #e0e0e0',
+        borderBottom: isEditing || !noData ? '1px solid var(--patient-border)' : 'none',
+        textAlign: 'center',
       }}>
-        <div>
-          <h3 style={{ margin: 0, fontSize: '0.95rem' }}>{section.title}</h3>
-          <p style={{ margin: 0, fontSize: '0.8rem', color: '#999' }}>{section.description}</p>
-        </div>
+        <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--patient-text)', marginBottom: '0.15rem' }}>
+          {section.title}
+        </p>
+        <p style={{ fontSize: '0.8rem', color: 'var(--patient-text-muted)' }}>{section.description}</p>
         {!isEditing && (
-          <button onClick={onEdit} style={{ fontSize: '0.85rem', flexShrink: 0, marginLeft: '1rem' }}>
+          <button
+            onClick={onEdit}
+            style={{
+              position: 'absolute',
+              right: '1.25rem',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'none',
+              border: '1px solid var(--patient-border)',
+              borderRadius: 'var(--radius-sm)',
+              padding: '0.3rem 0.8rem',
+              fontSize: '0.75rem',
+              color: noData ? 'var(--patient-accent)' : 'var(--patient-text-muted)',
+              cursor: 'pointer',
+              fontFamily: 'var(--font-body)',
+            }}
+          >
             {noData ? '+ Add' : 'Edit'}
           </button>
         )}
       </div>
 
-      <div style={{ padding: '1rem 1.25rem' }}>
-        {isEditing ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {section.fields.map(field => (
-              <div key={field.key}>
-                <label style={{ display: 'block', fontSize: '0.85rem', color: '#555', marginBottom: '0.3rem' }}>
-                  {field.label}
-                </label>
-                {field.type === 'textarea' ? (
-                  <textarea
-                    rows={3}
-                    value={draft[field.key] ?? ''}
-                    onChange={e => onDraftChange({ ...draft, [field.key]: e.target.value })}
-                    style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical' }}
-                  />
-                ) : field.type === 'select' ? (
-                  <select
-                    value={draft[field.key] ?? ''}
-                    onChange={e => onDraftChange({ ...draft, [field.key]: e.target.value })}
-                    style={{ width: '100%', boxSizing: 'border-box' }}
-                  >
-                    <option value="">Select...</option>
-                    {field.options!.map(opt => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    type={field.type ?? 'text'}
-                    value={draft[field.key] ?? ''}
-                    onChange={e => onDraftChange({ ...draft, [field.key]: e.target.value })}
-                    style={{ width: '100%', boxSizing: 'border-box' }}
-                  />
-                )}
-              </div>
-            ))}
-            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
-              <button onClick={onSave} disabled={saving}>
-                {saving ? 'Saving...' : 'Save'}
-              </button>
-              <button onClick={onCancel} style={{ background: 'none', border: '1px solid #ccc' }}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        ) : noData ? (
-          <p style={{ margin: 0, color: '#bbb', fontStyle: 'italic', fontSize: '0.9rem' }}>
-            No information added yet.
-          </p>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-            {section.fields.map(field => {
-              const value = data[field.key]
-              if (!value) return null
-              return (
+      {/* Body */}
+      {(isEditing || !noData) && (
+        <div style={{ padding: '1rem 1.25rem' }}>
+          {isEditing ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+              {section.fields.map(field => (
                 <div key={field.key}>
-                  <span style={{ fontSize: '0.8rem', color: '#999', display: 'block' }}>{field.label}</span>
-                  <span style={{ whiteSpace: 'pre-wrap' }}>{value}</span>
+                  <label style={{ display: 'block', fontSize: '0.72rem', color: 'var(--patient-text-muted)', marginBottom: '0.3rem', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                    {field.label}
+                  </label>
+                  {field.type === 'textarea' ? (
+                    <textarea
+                      rows={3}
+                      value={draft[field.key] ?? ''}
+                      onChange={e => onDraftChange({ ...draft, [field.key]: e.target.value })}
+                      style={{ ...inputStyle, resize: 'vertical' }}
+                    />
+                  ) : field.type === 'select' ? (
+                    <select
+                      value={draft[field.key] ?? ''}
+                      onChange={e => onDraftChange({ ...draft, [field.key]: e.target.value })}
+                      style={inputStyle}
+                    >
+                      <option value="">Select...</option>
+                      {field.options!.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type={field.type ?? 'text'}
+                      value={draft[field.key] ?? ''}
+                      onChange={e => onDraftChange({ ...draft, [field.key]: e.target.value })}
+                      style={inputStyle}
+                    />
+                  )}
                 </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
+              ))}
+              <div style={{ display: 'flex', gap: '0.6rem', marginTop: '0.25rem' }}>
+                <button
+                  onClick={onSave}
+                  disabled={saving}
+                  style={{
+                    background: saving ? 'var(--patient-border)' : 'var(--patient-accent)',
+                    border: 'none',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: '0.5rem 1.2rem',
+                    fontSize: '0.8rem',
+                    color: 'white',
+                    fontFamily: 'var(--font-body)',
+                    fontWeight: 500,
+                    cursor: saving ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {saving ? 'Saving...' : 'Save'}
+                </button>
+                <button
+                  onClick={onCancel}
+                  style={{
+                    background: 'none',
+                    border: '1px solid var(--patient-border)',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: '0.5rem 1.2rem',
+                    fontSize: '0.8rem',
+                    color: 'var(--patient-text-muted)',
+                    fontFamily: 'var(--font-body)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {section.fields.map(field => {
+                const value = data[field.key]
+                if (!value) return null
+                return (
+                  <div key={field.key}>
+                    <p style={{ fontSize: '0.72rem', color: 'var(--patient-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 500, marginBottom: '0.2rem' }}>
+                      {field.label}
+                    </p>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--patient-text)', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+                      {value}
+                    </p>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

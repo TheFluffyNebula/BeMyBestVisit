@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { useNavigate, Navigate } from 'react-router-dom'
+import { useState, useRef } from 'react'
+import { Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function Login() {
   const { user, login } = useAuth()
-  const navigate = useNavigate()
+  const pendingRedirect = useRef<string | null>(null)
 
   const [isRegister, setIsRegister] = useState(false)
   const [role, setRole] = useState<'provider' | 'patient'>('patient')
@@ -17,7 +17,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
 
   if (user) {
-    return <Navigate to={user.role === 'provider' ? '/provider' : '/patient'} replace />
+    const dest = pendingRedirect.current ?? (user.role === 'provider' ? '/provider' : '/patient')
+    return <Navigate to={dest} replace />
   }
 
   const isProvider = role === 'provider'
@@ -38,8 +39,10 @@ export default function Login() {
       })
       const data = await res.json()
       if (!res.ok) { setError(data.detail || 'Authentication failed'); return }
+      pendingRedirect.current = isRegister && data.role === 'patient'
+        ? '/patient/my-data'
+        : data.role === 'provider' ? '/provider' : '/patient'
       login({ email, name: data.name, role: data.role, token: data.access_token, job_title: data.job_title, institution: data.institution })
-      navigate(data.role === 'provider' ? '/provider' : '/patient', { replace: true })
     } catch {
       setError('Network error — is the backend running?')
     } finally {
@@ -114,7 +117,7 @@ export default function Login() {
           }}>
             BeMyBest<em style={{ fontStyle: 'italic' }}>Visit</em>
           </h1>
-          <p style={{ color: textMuted, fontSize: '0.875rem', lineHeight: 1.7, maxWidth: '260px' }}>
+          <p style={{ color: textMuted, fontSize: '0.875rem', lineHeight: 1.7 }}>
             Your health records, unified and in your hands.
           </p>
         </div>
@@ -122,7 +125,7 @@ export default function Login() {
         {/* Role toggle */}
         {!isRegister && (
           <div>
-            <p style={{ fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: textMuted, marginBottom: '0.75rem', fontWeight: 500 }}>
+            <p style={{ fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: accent, marginBottom: '0.75rem', fontWeight: 500 }}>
               Signing in as
             </p>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -131,6 +134,7 @@ export default function Login() {
                   key={r}
                   onClick={() => setRole(r)}
                   style={{
+                    flex: 1,
                     background: role === r ? accent : 'none',
                     border: `1px solid ${role === r ? accent : border}`,
                     borderRadius: 'var(--radius-sm)',
@@ -280,7 +284,7 @@ export default function Login() {
                   onMouseEnter={e => { e.currentTarget.style.borderColor = border; e.currentTarget.style.background = surface }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.background = 'none' }}
                 >
-                  <div>
+                  <div style={{ textAlign: 'left' }}>
                     <p style={{ fontSize: '0.825rem', color: text, fontWeight: 500, margin: 0 }}>{account.label}</p>
                     <p style={{ fontSize: '0.75rem', color: textMuted, margin: 0 }}>{account.sub}</p>
                   </div>
