@@ -24,6 +24,26 @@ app.add_middleware(
 )
 
 VISITS_FILE = Path(__file__).parent / "data" / "visits.json"
+FORMS_FILE = Path(__file__).parent / "data" / "forms.json"
+REQUESTS_FILE = Path(__file__).parent / "data" / "requests.json"
+PROVIDER_FORMS_FILE = Path(__file__).parent / "data" / "provider_forms.json"
+
+def load_forms():
+    with open(FORMS_FILE) as f:
+        return json.load(f)
+
+def load_requests():
+    with open(REQUESTS_FILE) as f:
+        return json.load(f)
+
+def save_requests(requests):
+    with open(REQUESTS_FILE, "w") as f:
+        json.dump(requests, f, indent=2)
+
+def load_provider_forms():
+    with open(PROVIDER_FORMS_FILE) as f:
+        return json.load(f)
+
 def load_visits():
     with open(VISITS_FILE) as f:
         return json.load(f)
@@ -32,18 +52,6 @@ def save_visits(visits):
         json.dump(visits, f, indent=2)
 # Load at startup
 visits = load_visits()
-
-# request_id -> { status, data, provider_name, provider_email }
-data_requests = {}
-
-# Mock patient data returned on consent approval
-MOCK_PATIENT_DATA = {
-    "name": "Jason Yin",
-    "dob": "1990-04-12",
-    "conditions": ["Type 2 Diabetes", "Hypertension"],
-    "medications": ["Metformin", "Lisinopril"],
-    "allergies": ["Penicillin"],
-}
 
 # --- Auth ---
 
@@ -106,46 +114,85 @@ async def summarize_visit_route(
 def get_visits(current_user: User = Depends(get_current_user)):
     return visits
 
-# --- Data requests ---
+# --- Requests ---
+@app.post("/api/requests")
+def create_request(current_user: User = Depends(get_current_user)):
+    provider_forms = load_provider_forms()
+    form_ids = provider_forms.get(current_user.email, [])
 
-# IMPORTANT: /pending/all must be defined before /{request_id}
-# otherwise FastAPI matches "pending" as the request_id path param.
+    # Build per-form status
+    form_statuses = {fid: "pending" for fid in form_ids}
 
-@app.get("/api/data-request/pending/all")
-def get_pending_requests(current_user: User = Depends(get_current_user)):
-    pending = [
-        {"request_id": rid, **val}
-        for rid, val in data_requests.items()
-        if val["status"] == "pending"
-    ]
+    request = {
+        "id": str(uuid.uuid4()),
+        "provider_email": current_user.email,
+        "provider_name": current_user.name,
+        "institution": current_user.institution,
+        "form_statuses": form_statuses,
+        "overall_status": "pending",
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+    requests_data = load_requests()
+    requests_data.append(request)
+    save_requests(requests_data)
+    return request
+
+@app.get("/api/requests/pending")
+def get_pending_requests_new(current_user: User = Depends(get_current_user)):
+    requests_data = load_requests()
+    pending = [r for r in requests_data if r["overall_status"] == "pending"]
     return pending
 
-@app.post("/api/data-request")
-def create_data_request(current_user: User = Depends(get_current_user)):
-    request_id = str(uuid.uuid4())
-    data_requests[request_id] = {
-        "status": "pending",
-        "data": None,
-        "provider_name": current_user.name,
-        "provider_institution": current_user.institution,
-        "provider_email": current_user.email,
-    }
-    return {"request_id": request_id}
-
-@app.get("/api/data-request/{request_id}")
-def get_data_request(request_id: str, current_user: User = Depends(get_current_user)):
-    req = data_requests.get(request_id)
-    if not req:
-        return {"status": "not_found"}
-    return {"request_id": request_id, **req}
-
-@app.post("/api/data-request/{request_id}/respond")
-def respond_to_request(request_id: str, approved: bool, current_user: User = Depends(get_current_user)):
-    req = data_requests.get(request_id)
+@app.get("/api/requests/{request_id}/status")
+def get_request_status(request_id: str, current_user: User = Depends(get_current_user)):
+    requests_data = load_requests()
+    req = next((r for r in requests_data if r["id"] == request_id), None)
     if not req:
         return {"error": "not found"}
-    if approved:
-        data_requests[request_id] = {**req, "status": "approved", "data": MOCK_PATIENT_DATA}
-    else:
-        data_requests[request_id] = {**req, "status": "denied", "data": None}
-    return {"status": data_requests[request_id]["status"]}
+    return req
+
+@app.post("/api/requests/{request_id}/respond")
+def respond_to_form_request(
+    request_id: str,
+    form_id: str,
+    approved: bool,
+    current_user: User = Depends(get_current_user)
+):
+    requests_data = load_requests()
+    req = next((r for r in requests_data if r["id"] == request_id), None)
+    if not req:
+        return {"error": "not found"}
+
+    req["form_statuses"][form_id] = "approved" if approved else "denied"
+
+    # Update overall status
+    statuses = list(req["form_statuses"].values())
+    if all(s == "approved" for s in statuses):
+        req["overall_status"] = "approved"
+    elif any(s == "denied" for s in statuses):
+        req["overall_status"] = "denied"
+    # else still pending
+
+    save_requests(requests_data)
+    return req
+
+# --- Forms ---
+
+@app.get("/api/forms")
+def get_forms(current_user: User = Depends(get_current_user)):
+    return load_forms()
+
+@app.post("/api/forms/dh9")
+def submit_dh9(
+    answers: dict,
+    current_user: User = Depends(get_current_user)
+):
+    forms_data = load_forms()
+    for form in forms_data["forms"]:
+        if form["id"] == "dh9":
+            form["filled"] = True
+            form["data"] = answers
+    with open(FORMS_FILE, "w") as f:
+        json.dump(forms_data, f, indent=2)
+    return {"status": "submitted"}

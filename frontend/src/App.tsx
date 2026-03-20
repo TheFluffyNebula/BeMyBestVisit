@@ -5,6 +5,9 @@ import Login from './views/Login'
 import ProviderView from './views/ProviderView'
 import PatientView from './views/PatientView'
 import VisitDetail from './views/VisitDetail'
+import RequestDataView from './views/RequestDataView'
+import PendingRequestsView from './views/PendingRequestsView'
+import DH9FormView from './views/DH9FormView'
 
 export default function App() {
   return (
@@ -19,6 +22,14 @@ export default function App() {
               <ProviderView />
             </ProtectedRoute>
           }
+        />
+        <Route 
+          path="/provider/request" 
+          element={
+            <ProtectedRoute role="provider">
+              <RequestDataView />
+            </ProtectedRoute>
+            } 
         />
         <Route
           path="/patient"
@@ -36,6 +47,22 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route 
+          path="/patient/requests" 
+            element={
+              <ProtectedRoute role="patient">
+                <PendingRequestsView />
+              </ProtectedRoute>
+            } 
+          />
+        <Route 
+          path="/patient/dh9/:requestId" 
+            element={
+              <ProtectedRoute role="patient">
+                <DH9FormView />
+              </ProtectedRoute>
+            } 
+          />
       </Routes>
     </AuthProvider>
   )

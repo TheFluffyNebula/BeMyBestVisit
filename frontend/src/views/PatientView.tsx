@@ -13,16 +13,9 @@ interface Visit {
   summary: string
 }
 
-interface DataRequest {
-  request_id: string
-  status: string
-  provider_name?: string
-}
-
 export default function PatientView() {
   const { user, logout } = useAuth()
   const [visits, setVisits] = useState<Visit[]>([])
-  const [pendingRequests, setPendingRequests] = useState<DataRequest[]>([])
   const navigate = useNavigate()
 
   const authHeader = { Authorization: `Bearer ${user?.token}` }
@@ -32,24 +25,6 @@ export default function PatientView() {
       .then(res => res.json())
       .then(data => setVisits(data))
   }, [])
-
-  // Poll for pending consent requests
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetch('http://localhost:8000/api/data-request/pending/all', { headers: authHeader })
-        .then(res => res.json())
-        .then(data => setPendingRequests(data))
-    }, 2000)
-    return () => clearInterval(interval)
-  }, [])
-
-  const handleRespond = async (requestId: string, approved: boolean) => {
-    await fetch(`http://localhost:8000/api/data-request/${requestId}/respond?approved=${approved}`, {
-      method: 'POST',
-      headers: authHeader,
-    })
-    setPendingRequests(prev => prev.filter(r => r.request_id !== requestId))
-  }
 
   const handleLogout = () => {
     logout()
@@ -69,17 +44,13 @@ export default function PatientView() {
         </div>
       </div>
 
-      {/* Consent prompts */}
-      {pendingRequests.map(req => (
-        <div key={req.request_id} style={{ border: '2px solid orange', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' }}>
-          <p><strong>{req.provider_name ?? 'Your provider'} is requesting access to your medical data.</strong></p>
-          <p>Do you consent to sharing your information?</p>
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <button onClick={() => handleRespond(req.request_id, true)}>Approve</button>
-            <button onClick={() => handleRespond(req.request_id, false)}>Deny</button>
-          </div>
-        </div>
-      ))}
+      {/* Pending requests button */}
+      <button
+        onClick={() => navigate('/patient/requests')}
+        style={{ marginBottom: '1.5rem' }}
+      >
+        📋 View Pending Requests
+      </button>
 
       {/* Visit history */}
       <h2>Your Visit History</h2>
