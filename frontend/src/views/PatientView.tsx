@@ -5,7 +5,9 @@ import { useAuth } from '../context/AuthContext'
 interface Visit {
   id: string
   date: string
-  provider: string
+  institution: string
+  doctor_name: string
+  job_title: string
   notes: string
   transcript: string
   summary: string
@@ -105,7 +107,7 @@ export default function PatientView() {
                   day: 'numeric'
                 })}
               </td>
-              <td style={{ fontWeight: 'bold' }}>{visit.provider}</td>
+              <td style={{ fontWeight: 'bold' }}>{visit.institution}</td>
             </tr>
           ))}
         </tbody>
