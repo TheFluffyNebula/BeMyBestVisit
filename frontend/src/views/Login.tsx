@@ -128,9 +128,26 @@ export default function Login() {
           </button>
 
           {!isRegister && (
-            <p style={{ fontSize: '0.85rem', color: '#666', margin: 0 }}>
-              Demo — provider@demo.com / patient@demo.com (password: password)
-            </p>
+            <div style={{ fontSize: '0.8rem', color: '#666', borderTop: '1px solid #eee', paddingTop: '0.75rem' }}>
+              <p style={{ margin: '0 0 0.4rem', fontWeight: 'bold' }}>Demo accounts (password: password)</p>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <tbody>
+                  {[
+                    { email: 'hailey@unchealth.com', label: 'Dr. Hailey — UNC Health' },
+                    { email: 'sans@dukehealth.com', label: 'Dr. Sans — Duke Health' },
+                    { email: 'sanders@sanderstherapy.com', label: 'Sanders Meander — Private Therapy' },
+                    { email: 'bob@bobtheprivatedentist.com', label: 'Dr. Bob — Private Dentist' },
+                    { email: 'patient@demo.com', label: 'Jason Yin — Patient' },
+                  ].map(({ email, label }) => (
+                    <tr key={email} style={{ cursor: 'pointer' }} onClick={() => setEmail(email)}>
+                      <td style={{ padding: '0.2rem 0.4rem', color: '#444' }}>{label}</td>
+                      <td style={{ padding: '0.2rem 0.4rem', color: '#999', fontFamily: 'monospace' }}>{email}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p style={{ margin: '0.4rem 0 0', color: '#aaa' }}>Click a row to fill in the email</p>
+            </div>
           )}
 
           <button
