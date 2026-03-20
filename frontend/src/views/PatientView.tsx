@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 interface Visit {
   id: string
+  date: string
+  provider: string
   notes: string
+  transcript: string
   summary: string
 }
 
@@ -14,6 +18,7 @@ interface DataRequest {
 export default function PatientView() {
   const [visits, setVisits] = useState<Visit[]>([])
   const [pendingRequests, setPendingRequests] = useState<DataRequest[]>([])
+  const navigate = useNavigate()
 
   useEffect(() => {
     fetch('http://localhost:8000/api/visits')
@@ -39,7 +44,7 @@ export default function PatientView() {
   }
 
   return (
-    <div style={{ maxWidth: '600px', margin: '2rem auto' }}>
+    <div style={{ maxWidth: '700px', margin: '2rem auto' }}>
       <h1>Patient Dashboard</h1>
 
       {/* Consent prompts */}
@@ -57,16 +62,34 @@ export default function PatientView() {
       {/* Visit history */}
       <h2>Your Visit History</h2>
       {visits.length === 0 && <p>No visits yet.</p>}
-      {visits.map(visit => (
-        <div key={visit.id} style={{ border: '1px solid #ccc', padding: '1rem', marginBottom: '1rem', borderRadius: '8px' }}>
-          <h3>Visit Summary</h3>
-          <p>{visit.summary}</p>
-          <details>
-            <summary>Original Notes</summary>
-            <p>{visit.notes}</p>
-          </details>
-        </div>
-      ))}
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr style={{ borderBottom: '2px solid #ccc', textAlign: 'left' }}>
+            <th style={{ padding: '0.75rem' }}>Date</th>
+            <th style={{ padding: '0.75rem' }}>Care Provider</th>
+          </tr>
+        </thead>
+        <tbody>
+          {visits.map(visit => (
+            <tr
+              key={visit.id}
+              onClick={() => navigate(`/patient/visit/${visit.id}`)}
+              style={{ borderBottom: '1px solid #eee', cursor: 'pointer' }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+            >
+              <td style={{ padding: '0.75rem', whiteSpace: 'nowrap' }}>
+                {new Date(visit.date).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </td>
+              <td style={{ fontWeight: 'bold' }}>{visit.provider}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }

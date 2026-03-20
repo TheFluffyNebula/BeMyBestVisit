@@ -10,6 +10,8 @@ import os
 import requests
 from ibm_watson import SpeechToTextV1
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+import json
+from pathlib import Path
 
 app = FastAPI()
 
@@ -21,7 +23,10 @@ app.add_middleware(
 )
 
 # In-memory store
-visits = []
+# Load dummy data at startup
+data_path = Path(__file__).parent / "data" / "visits.json"
+with open(data_path) as f:
+    visits = json.load(f)
 data_requests = {}  # request_id -> { status: pending/approved/denied, data: ... }
 
 # Mock patient data
