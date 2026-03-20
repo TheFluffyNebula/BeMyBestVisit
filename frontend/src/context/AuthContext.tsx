@@ -5,6 +5,8 @@ export interface AuthUser {
   name: string
   role: 'provider' | 'patient'
   token: string
+  job_title?: string
+  institution?: string
 }
 
 interface AuthContextType {

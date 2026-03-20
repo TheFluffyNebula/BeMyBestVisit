@@ -11,22 +11,25 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
+  const [jobTitle, setJobTitle] = useState('')
+  const [institution, setInstitution] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // Already logged in — redirect to correct dashboard
   if (user) {
     return <Navigate to={user.role === 'provider' ? '/provider' : '/patient'} replace />
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError('')
     setLoading(true)
 
     try {
       const url = isRegister ? '/api/auth/register' : '/api/auth/login'
-      const body = isRegister ? { email, password, name, role } : { email, password }
+      const body = isRegister
+        ? { email, password, name, role, job_title: jobTitle || null, institution: institution || null }
+        : { email, password }
 
       const res = await fetch(`http://localhost:8000${url}`, {
         method: 'POST',
@@ -40,7 +43,14 @@ export default function Login() {
         return
       }
 
-      login({ email, name: data.name, role: data.role, token: data.access_token })
+      login({
+        email,
+        name: data.name,
+        role: data.role,
+        token: data.access_token,
+        job_title: data.job_title,
+        institution: data.institution,
+      })
       navigate(data.role === 'provider' ? '/provider' : '/patient', { replace: true })
     } catch {
       setError('Network error — is the backend running?')
@@ -61,21 +71,11 @@ export default function Login() {
               <label style={{ display: 'block', marginBottom: '0.25rem' }}>Role</label>
               <div style={{ display: 'flex', gap: '1.5rem' }}>
                 <label>
-                  <input
-                    type="radio"
-                    value="patient"
-                    checked={role === 'patient'}
-                    onChange={() => setRole('patient')}
-                  />{' '}
+                  <input type="radio" value="patient" checked={role === 'patient'} onChange={() => setRole('patient')} />{' '}
                   Patient
                 </label>
                 <label>
-                  <input
-                    type="radio"
-                    value="provider"
-                    checked={role === 'provider'}
-                    onChange={() => setRole('provider')}
-                  />{' '}
+                  <input type="radio" value="provider" checked={role === 'provider'} onChange={() => setRole('provider')} />{' '}
                   Provider
                 </label>
               </div>
@@ -84,11 +84,26 @@ export default function Login() {
 
           {isRegister && (
             <input
-              placeholder="Full Name"
+              placeholder={role === 'provider' ? 'Full name with title (e.g. Dr. Smith)' : 'Full Name'}
               value={name}
               onChange={e => setName(e.target.value)}
               required
             />
+          )}
+
+          {isRegister && role === 'provider' && (
+            <>
+              <input
+                placeholder="Job title (e.g. Pediatrician, Cardiologist)"
+                value={jobTitle}
+                onChange={e => setJobTitle(e.target.value)}
+              />
+              <input
+                placeholder="Institution (e.g. UNC Health)"
+                value={institution}
+                onChange={e => setInstitution(e.target.value)}
+              />
+            </>
           )}
 
           <input
