@@ -8,6 +8,8 @@ import VisitDetail from './views/VisitDetail'
 import RequestDataView from './views/RequestDataView'
 import PendingRequestsView from './views/PendingRequestsView'
 import DH9FormView from './views/DH9FormView'
+import MyDataView from './views/MyDataView'
+import PatientOnboarding from './views/PatientOnboarding'
 
 export default function App() {
   return (
@@ -55,14 +57,30 @@ export default function App() {
               </ProtectedRoute>
             } 
           />
-        <Route 
-          path="/patient/dh9/:requestId" 
+        <Route
+          path="/patient/dh9/:requestId"
             element={
               <ProtectedRoute role="patient">
                 <DH9FormView />
               </ProtectedRoute>
-            } 
+            }
           />
+        <Route
+          path="/patient/my-data"
+          element={
+            <ProtectedRoute role="patient">
+              <MyDataView />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/patient/onboarding"
+          element={
+            <ProtectedRoute role="patient">
+              <PatientOnboarding />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </AuthProvider>
   )
