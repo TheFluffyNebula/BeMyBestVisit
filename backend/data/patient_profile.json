@@ -2,31 +2,107 @@
   "patient@demo.com": {
     "demographics": {
       "full_name": "Jason Yin",
-      "dob": "",
-      "gender": "",
-      "address": "",
-      "phone": "",
-      "emergency_contact_name": "",
-      "emergency_contact_phone": ""
+      "dob": "1992-04-15",
+      "gender": "Male",
+      "address": "214 Maple Ridge Dr, Chapel Hill, NC 27514",
+      "phone": "(919) 555-0183",
+      "emergency_contact_name": "Linda Yin (Mother)",
+      "emergency_contact_phone": "(919) 555-0247"
     },
     "medical_history": {
-      "conditions": "",
-      "hospitalizations": ""
+      "conditions": "Generalized Anxiety Disorder (diagnosed 2018)\nMild persistent asthma (diagnosed 2009)\nSeasonal allergic rhinitis",
+      "hospitalizations": "2019 - Emergency department visit for severe asthma exacerbation, UNC Medical Center, discharged same day"
     },
     "medications": {
-      "prescriptions": "",
-      "otc_supplements": ""
+      "prescriptions": "Albuterol HFA inhaler 90 mcg - as needed for asthma\nFluticasone propionate nasal spray 50 mcg - once daily for allergic rhinitis\nSertraline (Zoloft) 50 mg - once daily for anxiety",
+      "otc_supplements": "Cetirizine (Zyrtec) 10 mg - as needed for seasonal allergies\nVitamin D3 2000 IU - daily\nOmega-3 fish oil 1000 mg - daily"
     },
     "allergies": {
-      "drug_allergies": "",
-      "other_allergies": ""
+      "drug_allergies": "Penicillin - hives and facial swelling (confirmed allergy, first noted age 8)\nSulfonamides (sulfa drugs) - rash",
+      "other_allergies": "Tree pollen (moderate-severe, spring)\nDust mites (mild-moderate, year-round)\nCat dander (moderate)\nShellfish - mild GI upset (not anaphylactic)"
     },
     "family_history": {
-      "family_conditions": ""
+      "family_conditions": "Father (age 62): Type 2 diabetes, hypertension, hypercholesterolemia\nMother (age 59): Generalized anxiety disorder, hypothyroidism\nPaternal grandfather: Heart attack at age 71\nMaternal grandmother: Breast cancer (survived), osteoporosis"
     },
     "vaccinations": {
-      "vaccination_list": "",
-      "flu_shot": ""
+      "vaccination_list": "COVID-19 - Moderna primary series (2021), first booster (2022)\nTdap (tetanus, diphtheria, pertussis) - 2020\nMMR (measles, mumps, rubella) - childhood series complete\nVaricella - childhood series complete\nHepatitis B - childhood series complete\nMeningococcal - 2010 (college entry)",
+      "flu_shot": "Yes"
+    },
+    "mh_conditions": {
+      "mh_diagnoses": "Generalized Anxiety Disorder (GAD) - diagnosed 2018 by primary care physician, confirmed by therapist\nNo history of bipolar disorder, psychosis, or personality disorder diagnoses",
+      "mh_hospitalizations": "None",
+      "mh_onset": "First significant anxiety symptoms around age 24 during first year of graduate school"
+    },
+    "mh_treatment": {
+      "current_therapist": "Dr. Sarah Meander, LCSW - Sanders Therapy Practice",
+      "therapy_type": "Cognitive Behavioral Therapy (CBT)",
+      "therapy_frequency": "Bi-weekly",
+      "psych_medications": "Sertraline (Zoloft) 50 mg - once daily, prescribed by primary care physician, started March 2021"
+    },
+    "mh_recent": {
+      "mood_last2weeks": "Generally stable with moderate baseline anxiety. Occasional worry about work deadlines. Sleep has been inconsistent this past week.",
+      "sleep_issues": "Difficulty falling asleep when stressed - takes 45-60 minutes. No nightmares. Occasionally wakes around 3am.",
+      "anxiety_triggers": "Work deadlines and performance reviews, conflict in relationships, health-related news, crowded or loud environments",
+      "self_harm_history": "No history of self-harm or suicidal ideation"
+    },
+    "tech_access": {
+      "device_type": "Multiple devices",
+      "internet_quality": "Reliable broadband",
+      "preferred_platform": "Zoom",
+      "tech_comfort": "Very comfortable"
+    },
+    "comm_preferences": {
+      "preferred_contact": "Text message",
+      "best_contact_time": "Afternoon (12pm-5pm)",
+      "pharmacy_name": "CVS Pharmacy - East Franklin St",
+      "pharmacy_phone": "(919) 555-0312"
+    },
+    "physical_accommodations": {
+      "mobility_aids": "None",
+      "transfer_assistance": "No",
+      "parking_needs": "None"
+    },
+    "sensory_accommodations": {
+      "hearing_aids": "No",
+      "sign_language": "No",
+      "vision_impairment": "Wears corrective lenses (contact lenses daily, glasses as backup). No large-print needs.",
+      "language_preference": "English (native)"
+    },
+    "other_accommodations": {
+      "cognitive_accommodations": "Prefers written follow-up instructions in addition to verbal - helps with anxiety and memory retention",
+      "sensory_sensitivities": "Mild sensitivity to very loud environments; fluorescent lighting can increase anxiety during long appointments",
+      "support_person": "Sometimes",
+      "other_needs": "Prefers appointments in the morning when possible as anxiety tends to increase later in the day"
+    },
+    "primary_insurance": {
+      "insurer_name": "Blue Cross Blue Shield of North Carolina",
+      "plan_name": "Blue Advantage Silver PPO",
+      "member_id": "XYZ881042315",
+      "group_number": "GRP-77234",
+      "subscriber_name": "",
+      "subscriber_dob": ""
+    },
+    "secondary_insurance": {
+      "secondary_insurer": "",
+      "secondary_member_id": ""
+    },
+    "surgeries": {
+      "surgery_list": "Appendectomy - 2014, UNC Medical Center, laparoscopic, uncomplicated\nWisdom tooth extraction (all four) - 2012, oral surgery, local anesthesia",
+      "complications": "No complications or adverse reactions to anesthesia noted in either procedure"
+    },
+    "implants_devices": {
+      "implants": "None",
+      "mri_safe": "Yes"
+    },
+    "occupation_habits": {
+      "occupation": "Software Engineer (mid-level, remote)",
+      "exercise_frequency": "3-5 times/week",
+      "diet_notes": "No formal dietary restrictions. Limits processed foods and excess sugar. Avoids shellfish due to GI sensitivity."
+    },
+    "substance_use": {
+      "tobacco": "Never",
+      "alcohol": "Occasional (social)",
+      "recreational_drugs": "No current use. Tried marijuana recreationally in college (2011-2013), no use since."
     }
   }
 }
